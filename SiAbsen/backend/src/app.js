@@ -8,6 +8,7 @@ import tahunAjaranRoutes from './routes/tahunAjaran.js';
 import kelasRoutes from './routes/kelas.js';
 import mapelRoutes from './routes/mapel.js';
 import kelasMapelRoutes from './routes/kelasMapel.js';
+import siswaRoutes from './routes/siswa.js';
 import errorHandler from './middleware/errorHandler.js';
 
 /**
@@ -33,6 +34,7 @@ app.use('/api', tahunAjaranRoutes);
 app.use('/api', kelasRoutes);
 app.use('/api', mapelRoutes);
 app.use('/api', kelasMapelRoutes);
+app.use('/api', siswaRoutes);
 
 // 404 untuk rute yang tidak dikenal
 app.use((_req, res) => {
