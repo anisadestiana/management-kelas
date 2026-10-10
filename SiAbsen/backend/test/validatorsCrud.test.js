@@ -16,8 +16,16 @@ import { createPenilaianSchema } from '../src/validators/penilaian.js';
 import { upsertNilaiSchema } from '../src/validators/nilai.js';
 import { createSesiSchema } from '../src/validators/sesiPertemuan.js';
 import { upsertAbsensiSchema } from '../src/validators/absensi.js';
+import { createPengajuanSchema, putuskanPengajuanSchema } from '../src/validators/pengajuan.js';
 
 const UUID = '11111111-1111-1111-1111-111111111111';
+
+// Helper tanggal relatif terhadap hari ini (UTC), format YYYY-MM-DD.
+function hariDariSekarang(offset) {
+  const d = new Date();
+  const utc = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + offset));
+  return utc.toISOString().slice(0, 10);
+}
 
 // --- Tahun Ajaran ---
 test('createTahunAjaranSchema: valid lolos', () => {
@@ -180,5 +188,57 @@ test('upsertAbsensiSchema: status tidak dikenal ditolak', () => {
 
 test('upsertAbsensiSchema: array kosong ditolak', () => {
   const r = upsertAbsensiSchema.safeParse({ sesi_id: UUID, absensi: [] });
+  assert.equal(r.success, false);
+});
+
+// --- Pengajuan Izin/Sakit ---
+test('createPengajuanSchema: valid lolos (rentang pendek, hari ini)', () => {
+  const r = createPengajuanSchema.safeParse({
+    jenis: 'sakit',
+    tanggal_mulai: hariDariSekarang(0),
+    tanggal_selesai: hariDariSekarang(1),
+  });
+  assert.equal(r.success, true);
+});
+
+test('createPengajuanSchema: selesai sebelum mulai ditolak', () => {
+  const r = createPengajuanSchema.safeParse({
+    jenis: 'izin',
+    tanggal_mulai: hariDariSekarang(2),
+    tanggal_selesai: hariDariSekarang(1),
+  });
+  assert.equal(r.success, false);
+});
+
+test('createPengajuanSchema: rentang > 14 hari ditolak (IZN-6)', () => {
+  const r = createPengajuanSchema.safeParse({
+    jenis: 'izin',
+    tanggal_mulai: hariDariSekarang(0),
+    tanggal_selesai: hariDariSekarang(20),
+  });
+  assert.equal(r.success, false);
+});
+
+test('createPengajuanSchema: mulai mundur > 14 hari ditolak (IZN-6)', () => {
+  const r = createPengajuanSchema.safeParse({
+    jenis: 'sakit',
+    tanggal_mulai: hariDariSekarang(-20),
+    tanggal_selesai: hariDariSekarang(-20),
+  });
+  assert.equal(r.success, false);
+});
+
+test('createPengajuanSchema: alasan > 500 karakter ditolak', () => {
+  const r = createPengajuanSchema.safeParse({
+    jenis: 'izin',
+    tanggal_mulai: hariDariSekarang(0),
+    tanggal_selesai: hariDariSekarang(0),
+    alasan: 'x'.repeat(501),
+  });
+  assert.equal(r.success, false);
+});
+
+test('putuskanPengajuanSchema: keputusan tidak valid ditolak', () => {
+  const r = putuskanPengajuanSchema.safeParse({ keputusan: 'mungkin' });
   assert.equal(r.success, false);
 });

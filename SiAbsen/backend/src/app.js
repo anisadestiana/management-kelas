@@ -14,6 +14,7 @@ import penilaianRoutes from './routes/penilaian.js';
 import nilaiRoutes from './routes/nilai.js';
 import sesiRoutes from './routes/sesiPertemuan.js';
 import absensiRoutes from './routes/absensi.js';
+import pengajuanRoutes from './routes/pengajuan.js';
 import errorHandler from './middleware/errorHandler.js';
 
 /**
@@ -45,6 +46,7 @@ app.use('/api', penilaianRoutes);
 app.use('/api', nilaiRoutes);
 app.use('/api', sesiRoutes);
 app.use('/api', absensiRoutes);
+app.use('/api', pengajuanRoutes);
 
 // 404 untuk rute yang tidak dikenal
 app.use((_req, res) => {
