@@ -1,0 +1,30 @@
+{
+  "name": "siabsen-backend",
+  "version": "1.0.0",
+  "description": "Backend SiAbsen - Node.js + Express + Neon PostgreSQL",
+  "type": "module",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "migrate": "node scripts/migrate.js",
+    "seed:guru": "node scripts/seed-guru.js",
+    "seed:data": "node scripts/seed-data.js",
+    "test": "node --test --experimental-test-module-mocks"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.24.1"
+  }
+}
