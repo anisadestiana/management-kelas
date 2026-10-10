@@ -11,6 +11,7 @@ import kelasMapelRoutes from './routes/kelasMapel.js';
 import siswaRoutes from './routes/siswa.js';
 import komponenNilaiRoutes from './routes/komponenNilai.js';
 import penilaianRoutes from './routes/penilaian.js';
+import nilaiRoutes from './routes/nilai.js';
 import errorHandler from './middleware/errorHandler.js';
 
 /**
@@ -39,6 +40,7 @@ app.use('/api', kelasMapelRoutes);
 app.use('/api', siswaRoutes);
 app.use('/api', komponenNilaiRoutes);
 app.use('/api', penilaianRoutes);
+app.use('/api', nilaiRoutes);
 
 // 404 untuk rute yang tidak dikenal
 app.use((_req, res) => {

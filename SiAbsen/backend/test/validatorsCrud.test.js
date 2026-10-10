@@ -13,6 +13,7 @@ import {
   updateKomponenNilaiSchema,
 } from '../src/validators/komponenNilai.js';
 import { createPenilaianSchema } from '../src/validators/penilaian.js';
+import { upsertNilaiSchema } from '../src/validators/nilai.js';
 
 const UUID = '11111111-1111-1111-1111-111111111111';
 
@@ -117,5 +118,27 @@ test('createPenilaianSchema: tanggal format salah ditolak', () => {
 
 test('createPenilaianSchema: judul kosong ditolak', () => {
   const r = createPenilaianSchema.safeParse({ komponen_id: UUID, judul: '' });
+  assert.equal(r.success, false);
+});
+
+// --- Nilai ---
+test('upsertNilaiSchema: valid lolos (skor angka & null)', () => {
+  const r = upsertNilaiSchema.safeParse({
+    penilaian_id: UUID,
+    nilai: [{ siswa_id: UUID, skor: 90 }, { siswa_id: UUID, skor: null }],
+  });
+  assert.equal(r.success, true);
+});
+
+test('upsertNilaiSchema: skor > 100 ditolak', () => {
+  const r = upsertNilaiSchema.safeParse({
+    penilaian_id: UUID,
+    nilai: [{ siswa_id: UUID, skor: 120 }],
+  });
+  assert.equal(r.success, false);
+});
+
+test('upsertNilaiSchema: array kosong ditolak', () => {
+  const r = upsertNilaiSchema.safeParse({ penilaian_id: UUID, nilai: [] });
   assert.equal(r.success, false);
 });
