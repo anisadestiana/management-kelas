@@ -14,6 +14,7 @@ import {
 } from '../src/validators/komponenNilai.js';
 import { createPenilaianSchema } from '../src/validators/penilaian.js';
 import { upsertNilaiSchema } from '../src/validators/nilai.js';
+import { createSesiSchema } from '../src/validators/sesiPertemuan.js';
 
 const UUID = '11111111-1111-1111-1111-111111111111';
 
@@ -140,5 +141,21 @@ test('upsertNilaiSchema: skor > 100 ditolak', () => {
 
 test('upsertNilaiSchema: array kosong ditolak', () => {
   const r = upsertNilaiSchema.safeParse({ penilaian_id: UUID, nilai: [] });
+  assert.equal(r.success, false);
+});
+
+// --- Sesi Pertemuan ---
+test('createSesiSchema: valid lolos', () => {
+  const r = createSesiSchema.safeParse({ kelas_mapel_id: UUID, tanggal: '2026-02-01', pertemuan_ke: 1 });
+  assert.equal(r.success, true);
+});
+
+test('createSesiSchema: pertemuan_ke < 1 ditolak', () => {
+  const r = createSesiSchema.safeParse({ kelas_mapel_id: UUID, tanggal: '2026-02-01', pertemuan_ke: 0 });
+  assert.equal(r.success, false);
+});
+
+test('createSesiSchema: tanggal wajib', () => {
+  const r = createSesiSchema.safeParse({ kelas_mapel_id: UUID, pertemuan_ke: 1 });
   assert.equal(r.success, false);
 });
