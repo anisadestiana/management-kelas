@@ -7,6 +7,7 @@
 // Respons TIDAK PERNAH menyertakan password_hash.
 import { AppError } from '../lib/appError.js';
 import { hashPassword } from '../lib/password.js';
+import { parseCsv } from '../lib/csv.js';
 import { sql } from '../db.js';
 
 // Password default bila guru tidak menentukan (konsisten dengan seed-data.js).
@@ -152,4 +153,58 @@ export async function remove(id) {
   if (rows.length === 0) {
     throw new AppError('NOT_FOUND', 'Siswa tidak ditemukan', 404);
   }
+}
+
+/**
+ * Impor banyak siswa dari teks CSV. Header wajib memuat kolom `nis` dan
+ * `nama_lengkap`; kolom `kelas_id` opsional per baris. Bila baris tidak punya
+ * kelas_id, dipakai defaultKelasId (dari body) bila ada.
+ *
+ * Bersifat best-effort per baris: baris valid dibuat, baris gagal dicatat
+ * dengan nomor baris & alasan. Mengembalikan ringkasan hasil.
+ */
+export async function importCsv(csvText, defaultKelasId) {
+  const { header, rows } = parseCsv(csvText);
+
+  if (!header.includes('nis') || !header.includes('nama_lengkap')) {
+    throw new AppError(
+      'VALIDATION_ERROR',
+      "Header CSV wajib memuat kolom 'nis' dan 'nama_lengkap'",
+      400
+    );
+  }
+
+  if (defaultKelasId) {
+    await assertKelasExists(defaultKelasId);
+  }
+
+  const detailGagal = [];
+  const detailBerhasil = [];
+
+  for (const { data, lineNumber } of rows) {
+    const nis = (data.nis || '').trim();
+    const namaLengkap = (data.nama_lengkap || '').trim();
+    const kelasId = (data.kelas_id || '').trim() || defaultKelasId || undefined;
+
+    if (!nis || !namaLengkap) {
+      detailGagal.push({ baris: lineNumber, nis, alasan: 'NIS dan nama lengkap wajib diisi' });
+      continue;
+    }
+
+    try {
+      const siswa = await create({ nis, nama_lengkap: namaLengkap, kelas_id: kelasId });
+      detailBerhasil.push({ baris: lineNumber, id: siswa.id, nis });
+    } catch (err) {
+      const alasan = err instanceof AppError ? err.message : 'Gagal menyimpan';
+      detailGagal.push({ baris: lineNumber, nis, alasan });
+    }
+  }
+
+  return {
+    total: rows.length,
+    berhasil: detailBerhasil.length,
+    gagal: detailGagal.length,
+    detail_berhasil: detailBerhasil,
+    detail_gagal: detailGagal,
+  };
 }

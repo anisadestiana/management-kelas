@@ -36,3 +36,10 @@ export const resetPasswordSchema = z.object({
 export const listSiswaQuerySchema = z.object({
   kelas_id: z.string().uuid('Kelas tidak valid').optional(),
 });
+
+export const importSiswaSchema = z.object({
+  // Isi file CSV sebagai teks mentah (header: nis,nama_lengkap[,kelas_id]).
+  csv: z.string({ required_error: 'Data CSV wajib diisi' }).min(1, 'Data CSV wajib diisi'),
+  // kelas_id default untuk baris yang tidak menyertakan kolom kelas_id.
+  kelas_id: z.string().uuid('Kelas tidak valid').optional(),
+});

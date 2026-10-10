@@ -5,6 +5,7 @@ import {
   updateSiswaSchema,
   resetPasswordSchema,
   listSiswaQuerySchema,
+  importSiswaSchema,
 } from '../validators/siswa.js';
 import { AppError } from '../lib/appError.js';
 
@@ -53,6 +54,12 @@ export const resetPassword = asyncHandler(async (req, res) => {
   const { password } = validate(resetPasswordSchema, req.body ?? {});
   await siswaService.resetPassword(req.params.id, password);
   res.json({ message: 'Password siswa berhasil direset' });
+});
+
+export const importCsv = asyncHandler(async (req, res) => {
+  const { csv, kelas_id } = validate(importSiswaSchema, req.body);
+  const hasil = await siswaService.importCsv(csv, kelas_id);
+  res.status(201).json({ data: hasil });
 });
 
 export const remove = asyncHandler(async (req, res) => {
