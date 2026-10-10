@@ -13,6 +13,7 @@ import komponenNilaiRoutes from './routes/komponenNilai.js';
 import penilaianRoutes from './routes/penilaian.js';
 import nilaiRoutes from './routes/nilai.js';
 import sesiRoutes from './routes/sesiPertemuan.js';
+import absensiRoutes from './routes/absensi.js';
 import errorHandler from './middleware/errorHandler.js';
 
 /**
@@ -43,6 +44,7 @@ app.use('/api', komponenNilaiRoutes);
 app.use('/api', penilaianRoutes);
 app.use('/api', nilaiRoutes);
 app.use('/api', sesiRoutes);
+app.use('/api', absensiRoutes);
 
 // 404 untuk rute yang tidak dikenal
 app.use((_req, res) => {

@@ -15,6 +15,7 @@ import {
 import { createPenilaianSchema } from '../src/validators/penilaian.js';
 import { upsertNilaiSchema } from '../src/validators/nilai.js';
 import { createSesiSchema } from '../src/validators/sesiPertemuan.js';
+import { upsertAbsensiSchema } from '../src/validators/absensi.js';
 
 const UUID = '11111111-1111-1111-1111-111111111111';
 
@@ -157,5 +158,27 @@ test('createSesiSchema: pertemuan_ke < 1 ditolak', () => {
 
 test('createSesiSchema: tanggal wajib', () => {
   const r = createSesiSchema.safeParse({ kelas_mapel_id: UUID, pertemuan_ke: 1 });
+  assert.equal(r.success, false);
+});
+
+// --- Absensi ---
+test('upsertAbsensiSchema: status valid lolos', () => {
+  const r = upsertAbsensiSchema.safeParse({
+    sesi_id: UUID,
+    absensi: [{ siswa_id: UUID, status: 'hadir' }],
+  });
+  assert.equal(r.success, true);
+});
+
+test('upsertAbsensiSchema: status tidak dikenal ditolak', () => {
+  const r = upsertAbsensiSchema.safeParse({
+    sesi_id: UUID,
+    absensi: [{ siswa_id: UUID, status: 'bolos' }],
+  });
+  assert.equal(r.success, false);
+});
+
+test('upsertAbsensiSchema: array kosong ditolak', () => {
+  const r = upsertAbsensiSchema.safeParse({ sesi_id: UUID, absensi: [] });
   assert.equal(r.success, false);
 });
