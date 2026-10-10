@@ -8,6 +8,10 @@ import { createKelasSchema } from '../src/validators/kelas.js';
 import { createMapelSchema } from '../src/validators/mapel.js';
 import { createKelasMapelSchema } from '../src/validators/kelasMapel.js';
 import { createSiswaSchema, importSiswaSchema } from '../src/validators/siswa.js';
+import {
+  createKomponenNilaiSchema,
+  updateKomponenNilaiSchema,
+} from '../src/validators/komponenNilai.js';
 
 const UUID = '11111111-1111-1111-1111-111111111111';
 
@@ -76,4 +80,25 @@ test('importSiswaSchema: csv wajib', () => {
 test('importSiswaSchema: valid lolos', () => {
   const r = importSiswaSchema.safeParse({ csv: 'nis,nama_lengkap\n1,A' });
   assert.equal(r.success, true);
+});
+
+// --- Komponen Nilai ---
+test('createKomponenNilaiSchema: valid lolos', () => {
+  const r = createKomponenNilaiSchema.safeParse({ kelas_mapel_id: UUID, nama: 'UTS', bobot: 30 });
+  assert.equal(r.success, true);
+});
+
+test('createKomponenNilaiSchema: bobot > 100 ditolak', () => {
+  const r = createKomponenNilaiSchema.safeParse({ kelas_mapel_id: UUID, nama: 'UTS', bobot: 150 });
+  assert.equal(r.success, false);
+});
+
+test('createKomponenNilaiSchema: bobot wajib angka', () => {
+  const r = createKomponenNilaiSchema.safeParse({ kelas_mapel_id: UUID, nama: 'UTS', bobot: '30' });
+  assert.equal(r.success, false);
+});
+
+test('updateKomponenNilaiSchema: objek kosong ditolak', () => {
+  const r = updateKomponenNilaiSchema.safeParse({});
+  assert.equal(r.success, false);
 });
