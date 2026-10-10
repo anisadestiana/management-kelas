@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import healthRoutes from './routes/health.js';
 import authRoutes from './routes/auth.js';
+import tahunAjaranRoutes from './routes/tahunAjaran.js';
 import errorHandler from './middleware/errorHandler.js';
 
 /**
@@ -25,6 +26,7 @@ app.use(cookieParser());
 // Semua endpoint API memakai prefix /api
 app.use('/api', healthRoutes);
 app.use('/api', authRoutes);
+app.use('/api', tahunAjaranRoutes);
 
 // 404 untuk rute yang tidak dikenal
 app.use((_req, res) => {
